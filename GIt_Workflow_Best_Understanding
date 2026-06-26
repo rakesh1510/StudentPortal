@@ -1,0 +1,92 @@
+main                    ← Stable release
+
+develop                 ← Latest integrated code
+
+feature/student-api     ← Your branch
+
+(feature/auth)          ← Future
+
+(feature/frontend)      ← Future
+
+PS C:\Users\rprajapati> ^C
+PS C:\Users\rprajapati> curl.exe -X GET "http://127.0.0.1:8000/students" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGdtYWlsLmNvbSIsImV4cCI6MTc4MjI5NDI2MX0.g3OavASxtJTjt0EeLunVmhvujFWiSefnq7exwDTcaBc"
+{"logged_in_user":"john@gmail.com","students":[{"name":"Rakesh","email":"rp151090@gmail.com","course":"Python FastAPI","age":35,"id":1,"created_at":"2026-06-23T13:51:37"},{"name":"Rakesdssh","email":"rp151sds090@gmdail.com","course":"Python ssdsd","age":35,"id":2,"created_at":"2026-06-23T13:52:03"},{"name":"Raksdsesdssh","email":"rp151ssvcsds090@gmdail.com","course":"Pydcvcsdsthon ssdsd","age":35,"id":4,"created_at":"2026-06-23T13:52:34"}]}
+PS C:\Users\rprajapati>
+
+What each file does
+data_level0.bin
+
+This contains the actual vector data (embeddings) and level-0 nodes of the HNSW index.
+
+Think:
+
+chunk_0 → [0.123, -0.456, 0.789, ...]
+chunk_1 → [0.111, -0.222, 0.333, ...]
+
+The vectors are primarily stored here.
+
+link_lists.bin
+
+Stores the graph connections between vectors.
+
+Example:
+
+chunk_0 → nearest neighbors:
+    chunk_7
+    chunk_23
+    chunk_55
+
+This is what makes similarity search fast.
+
+header.bin
+
+Stores index metadata:
+
+dimension = 384
+vector_count = 154
+length.bin
+
+Stores record lengths/offset information used internally.
+
+Simplified architecture
+PDF
+ ↓
+154 Chunks
+ ↓
+SentenceTransformer
+ ↓
+154 vectors (384 dimensions each)
+ ↓
+ChromaDB
+
+SQLite Tables:
+--------------
+collections
+embeddings
+embedding_metadata
+
+Binary Files:
+-------------
+data_level0.bin   ← vectors
+link_lists.bin    ← neighbor graph
+header.bin        ← metadata
+length.bin        ← offsets
+Interview answer
+
+If someone asks:
+
+Which file stores vector data in ChromaDB?
+
+You can say:
+
+The vector embeddings are primarily stored and indexed in data_level0.bin, while link_lists.bin stores the HNSW graph connections used for nearest-neighbor search. Metadata and document text are stored in the SQLite database tables.
+
+That's the practical answer AI/ML interviewers expect. 🚀
+
+If interviewer asks
+
+Where are your vectors stored?
+
+You can answer:
+
+The document chunks are stored as metadata in ChromaDB's SQLite tables, while the actual embedding vectors are stored in the vector index files. In my project, the main vector storage file is data_level0.bin, which contains approximately 167 KB of vector data for 154 embedded chunks.
